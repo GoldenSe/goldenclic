@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер золота</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        #goldDisplay {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #clicker {
+            width: 120px;
+            height: 120px;
+            background-color: #ffd700;
+            border: 2px solid #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            background: url('pickaxe.png') no-repeat center center;
+            background-size: 60%;
+        }
+        #pickaxeStatus {
+            margin-top: 5px;
+            font-size: 18px;
+        }
+        #connectMetaMask, #connectTonkeeper, #repairPickaxe, #withdrawGold {
+            margin-top: 20px;
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        #connectMetaMask {
+            background-color: #f6851b;
+            color: white;
+        }
+        #connectTonkeeper {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #repairPickaxe {
+            background-color: #FF5722;
+            color: white;
+        }
+        #withdrawGold {
+            background-color: #2196F3;
+            color: white;
+        }
+        #addressInput {
+            margin-top: 20px;
+            font-size: 18px;
+            padding: 10px;
+            width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+    </style>
+    <script src="https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/cdn/metamask-sdk.js"></script>
+    <script>
+        // Initialize MetaMask SDK
+        const MMSDK = new MetaMaskSDK.MetaMaskSDK({
+            dappMetadata: {
+                name: "Gold Clicker Dapp",
+                url: window.location.href,
+            },
+            infuraAPIKey: 'YOUR_INFURA_API_KEY', // Замените на ваш Infura API ключ
+        });
+
+        let ethereum;
+
+        // Wait for MetaMask SDK to initialize
+        setTimeout(() => {
+            ethereum = MMSDK.getProvider();
+
+            // Add listener for MetaMask connection
+            ethereum.on('accountsChanged', (accounts) => {
+                console.log('Accounts changed:', accounts);
+                // Update UI or perform actions based on the new accounts
+            });
+
+            ethereum.on('chainChanged', (chainId) => {
+                console.log('Chain changed:', chainId);
+                // Update UI or perform actions based on the new chain
+            });
+        }, 0);
+    </script>
+</head>
+<body>
+    <div id="goldDisplay">Золото: 0</div>
+    <div id="clicker">Кликни!</div>
+    <div id="pickaxeStatus">Прочность кирки: 100%</div>
+    <input type="text" id="addressInput" placeholder="Введите адрес получателя" />
+    <button id="connectMetaMask">Подключить MetaMask</button>
+    <button id="connectTonkeeper">Подключить Tonkeeper</button>
+    <button id="repairPickaxe">Починить кирку</button>
+    <button id="withdrawGold">Вывести золото</button>
+    <script src="app.js"></script>
+</body>
+</html>
