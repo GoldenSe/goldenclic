@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер золота</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        #goldDisplay {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #clicker {
+            width: 120px;
+            height: 120px;
+            background-color: #ffd700;
+            border: 2px solid #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            background: url('pickaxe.png') no-repeat center center;
+            background-size: 60%;
+        }
+        #pickaxeStatus {
+            margin-top: 5px;
+            font-size: 18px;
+        }
+        #connectTonkeeper, #repairPickaxe, #withdrawGold {
+            margin-top: 20px;
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        #connectTonkeeper {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #repairPickaxe {
+            background-color: #FF5722;
+            color: white;
+        }
+        #withdrawGold {
+            background-color: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="goldDisplay">Золото: 0</div>
+    <div id="clicker">Кликни!</div>
+    <div id="pickaxeStatus">Прочность кирки: 100%</div>
+    <button id="connectTonkeeper">Подключить Tonkeeper</button>
+    <button id="repairPickaxe">Починить кирку</button>
+    <button id="withdrawGold">Вывести золото</button>
+    <script src="app.js"></script>
+</body>
+</html>
