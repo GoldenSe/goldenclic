@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер золота</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        #goldDisplay {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #clicker {
+            width: 100px;
+            height: 100px;
+            background-color: #ffd700;
+            border: 2px solid #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        #pickaxe {
+            width: 50px;
+            height: 50px;
+            margin-top: 20px;
+            background: url('pickaxe.png') no-repeat center center;
+            background-size: contain;
+        }
+        #pickaxeStatus {
+            margin-top: 5px;
+            font-size: 18px;
+        }
+        #connectTonkeeper {
+            margin-top: 20px;
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="goldDisplay">Золото: 0</div>
+    <div id="clicker">Кликни!</div>
+    <div id="pickaxe"></div>
+    <div id="pickaxeStatus">Прочность кирки: 100%</div>
+    <button id="connectTonkeeper">Подключить Tonkeeper</button>
+    <script src="app.js"></script>
+</body>
+</html>
