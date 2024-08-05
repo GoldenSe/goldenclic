@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кликер золота</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
         body {
             display: flex;
             flex-direction: column;
@@ -14,16 +12,7 @@
             justify-content: center;
             height: 100vh;
             background-color: #f4f4f4;
-            font-family: 'Roboto', sans-serif;
-        }
-        #info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 18px;
-        }
-        #info p {
-            margin: 5px 0;
+            font-family: 'Arial', sans-serif;
         }
         #goldDisplay {
             font-size: 24px;
@@ -42,16 +31,16 @@
             cursor: pointer;
             background: url('pickaxe.png') no-repeat center center;
             background-size: 60%;
-            transition: transform 0.1s ease;
+            transition: transform 0.2s;
         }
         #clicker:active {
             transform: scale(0.9);
         }
-        #pickaxeStatus {
+        #pickaxeStatus, #userInfo {
             margin-top: 5px;
             font-size: 18px;
         }
-        #connectMetaMask, #connectTonkeeper, #repairPickaxe, #withdrawGold {
+        #connectMetaMask, #repairPickaxe, #withdrawGold {
             margin-top: 20px;
             font-size: 18px;
             padding: 10px 20px;
@@ -60,10 +49,6 @@
             border-radius: 5px;
         }
         #connectMetaMask {
-            background-color: #f6851b;
-            color: white;
-        }
-        #connectTonkeeper {
             background-color: #4CAF50;
             color: white;
         }
@@ -83,20 +68,23 @@
             border-radius: 5px;
             border: 1px solid #ddd;
         }
+        .hidden {
+            display: none;
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://c0f4f41c-2f55-4863-921b-sdk-docs.github.io/cdn/metamask-sdk.js"></script>
 </head>
 <body>
-    <div id="info">
-        <p id="userAddress">Адрес: Не подключен</p>
-        <p id="userBalance">Баланс: 0 ETH</p>
+    <div id="userInfo" class="hidden">
+        <div id="userAddress">Адрес: </div>
+        <div id="userBalance">Баланс: </div>
     </div>
     <div id="goldDisplay">Золото: 0</div>
     <div id="clicker">Кликни!</div>
     <div id="pickaxeStatus">Прочность кирки: 100%</div>
     <input type="text" id="addressInput" placeholder="Введите адрес получателя" />
     <button id="connectMetaMask">Подключить MetaMask</button>
-    <button id="connectTonkeeper">Подключить Tonkeeper</button>
     <button id="repairPickaxe">Починить кирку</button>
     <button id="withdrawGold">Вывести золото</button>
     <script src="app.js"></script>
