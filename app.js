@@ -1,14 +1,17 @@
 let gold = 0;
 let pickaxeDurability = 100;
+let ethereum;
 let userAccount = null;
+let userBalance = 0;
 
-// Обработчик клика по кнопке для подключения MetaMask
 document.getElementById('connectMetaMask').addEventListener('click', async () => {
-    if (ethereum) {
+    if (window.ethereum) {
+        ethereum = window.ethereum;
         try {
             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
             userAccount = accounts[0];
-            alert(`Подключено: ${userAccount}`);
+            updateUserInfo();
+            fetchUserBalance();
         } catch (error) {
             console.error('Ошибка подключения MetaMask:', error);
             alert('Не удалось подключиться к MetaMask.');
@@ -17,6 +20,39 @@ document.getElementById('connectMetaMask').addEventListener('click', async () =>
         alert('MetaMask не установлен.');
     }
 });
+
+async function fetchUserBalance() {
+    if (ethereum && userAccount) {
+        try {
+            const balanceWei = await ethereum.request({
+                method: 'eth_getBalance',
+                params: [userAccount, 'latest'],
+            });
+            userBalance = parseFloat(ethereum.utils.formatEther(balanceWei));
+            updateUserInfo();
+        } catch (error) {
+            console.error('Ошибка получения баланса:', error);
+        }
+    }
+}
+
+function updateUserInfo() {
+    document.getElementById('userAddress').textContent = `Адрес: ${userAccount || 'Не подключен'}`;
+    document.getElementById('userBalance').textContent = `Баланс: ${userBalance} ETH`;
+}
+
+function saveGold() {
+    localStorage.setItem('gold', gold);
+}
+
+function loadGold() {
+    const savedGold = localStorage.getItem('gold');
+    if (savedGold) {
+        gold = parseFloat(savedGold);
+        gold = Math.round(gold * 10) / 10; // Округляем до одной цифры после запятой
+        document.getElementById('goldDisplay').textContent = `Золото: ${gold}`;
+    }
+}
 
 document.getElementById('clicker').addEventListener('click', () => {
     if (pickaxeDurability > 0) {
@@ -28,6 +64,7 @@ document.getElementById('clicker').addEventListener('click', () => {
         pickaxeDurability -= 0.5;
         if (pickaxeDurability < 0) pickaxeDurability = 0;
         document.getElementById('pickaxeStatus').textContent = `Прочность кирки: ${pickaxeDurability}%`;
+        saveGold();
     } else {
         alert('Кирка сломалась! Вы не можете добывать золото.');
     }
@@ -51,6 +88,7 @@ document.getElementById('repairPickaxe').addEventListener('click', () => {
         pickaxeDurability = 100; // Восстанавливаем кирку
         document.getElementById('goldDisplay').textContent = `Золото: ${gold}`;
         document.getElementById('pickaxeStatus').textContent = `Прочность кирки: ${pickaxeDurability}%`;
+        saveGold();
     } else {
         alert('Недостаточно золота для ремонта кирки.');
     }
@@ -66,3 +104,6 @@ document.getElementById('withdrawGold').addEventListener('click', () => {
         alert('Пожалуйста, введите адрес получателя.');
     }
 });
+
+// Load saved gold on page load
+window.onload = loadGold;
