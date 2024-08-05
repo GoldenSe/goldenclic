@@ -1,21 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png">
-    <link rel="mask-icon" href="%PUBLIC_URL%/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Example of a dapp that connects to the wallet via ton-connect v2"
-    />
-    <title>Demo Dapp</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-  </body>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер</title>
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+    <style>
+        #connectButton {
+            margin: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #status {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="status">Статус: Не подключен</div>
+    <button id="connectButton">Подключить кошелек</button>
+
+    <script>
+        // Инициализация TonConnect SDK
+        const connector = new TonConnectSDK.TonConnect({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp/tonconnect-manifest.json' // URL манифеста вашего приложения
+        });
+
+        // Функция для обновления статуса
+        function updateStatus(message) {
+            document.getElementById('status').textContent = `Статус: ${message}`;
+        }
+
+        // Подключение кошелька
+        document.getElementById('connectButton').addEventListener('click', async () => {
+            try {
+                // Получение списка поддерживаемых кошельков
+                const walletsList = await connector.getWallets();
+
+                // Проверка наличия доступных кошельков
+                if (walletsList.length === 0) {
+                    alert('Нет доступных кошельков для подключения');
+                    return;
+                }
+
+                // Выбор первого доступного кошелька
+                const wallet = walletsList[0];
+
+                // Подключение к выбранному кошельку
+                if (wallet.universalLink) {
+                    await connector.connect({ 
+                        universalLink: wallet.universalLink,
+                        bridgeUrl: wallet.bridgeUrl
+                    });
+                } else if (wallet.jsBridgeKey) {
+                    await connector.connect({ jsBridgeKey: wallet.jsBridgeKey });
+                } else {
+                    alert('Не удалось подключиться к выбранному кошельку');
+                    return;
+                }
+
+                // Подписка на изменения статуса
+                connector.onStatusChange(walletInfo => {
+                    if (walletInfo) {
+                        updateStatus(`Подключен к ${walletInfo.name}`);
+                    } else {
+                        updateStatus('Не подключен');
+                    }
+                });
+            } catch (error) {
+                console.error('Ошибка подключения к кошельку:', error);
+                alert('Не удалось подключиться к кошельку');
+            }
+        });
+    </script>
+</body>
 </html>
