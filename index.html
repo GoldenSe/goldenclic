@@ -6,7 +6,7 @@
     <title>Кликер</title>
     <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
     <style>
-        #connectButton {
+        #connectButton, #mineButton {
             margin: 10px;
             padding: 10px;
             background-color: #007bff;
@@ -24,11 +24,19 @@
     <div id="status">Статус: Не подключен</div>
     <button id="connectButton">Подключить кошелек</button>
     <button id="mineButton">Добыть золото</button>
+
     <script>
+        // Инициализация TonConnect SDK
         const connector = new TonConnectSDK.TonConnect({
             manifestUrl: 'https://goldense.github.io/goldenclic/tonconnect-manifest.json'
         });
 
+        // Функция для обновления статуса
+        function updateStatus(message) {
+            document.getElementById('status').textContent = `Статус: ${message}`;
+        }
+
+        // Подключение кошелька
         document.getElementById('connectButton').addEventListener('click', async () => {
             try {
                 const walletsList = await connector.getWallets();
@@ -42,9 +50,9 @@
                     await connector.connect(source);
                     connector.onStatusChange(walletInfo => {
                         if (walletInfo) {
-                            document.getElementById('status').textContent = `Статус: Подключен к ${walletInfo.name}`;
+                            updateStatus(`Подключен к ${walletInfo.name}`);
                         } else {
-                            document.getElementById('status').textContent = 'Статус: Не подключен';
+                            updateStatus('Не подключен');
                         }
                     });
                 } else {
@@ -52,17 +60,37 @@
                 }
             } catch (error) {
                 console.error('Ошибка подключения к кошельку:', error);
+                alert('Не удалось подключиться к кошельку');
             }
         });
 
+        // Добыча золота
         document.getElementById('mineButton').addEventListener('click', async () => {
             if (!connector.connected) {
                 alert('Пожалуйста, подключите кошелек');
                 return;
             }
 
-            // Здесь можно добавить логику добычи золота
-            alert('Золото добыто!');
+            try {
+                // Здесь добавьте логику для отправки транзакции или работы с токенами
+                // Например, вы можете отправить транзакцию для получения токенов
+
+                const transaction = {
+                    validUntil: Math.floor(Date.now() / 1000) + 60, // 60 сек
+                    messages: [
+                        {
+                            address: "YOUR_RECEIVER_ADDRESS_HERE", // Адрес для получения токенов
+                            amount: "1000000", // Количество токенов
+                        }
+                    ]
+                };
+
+                const result = await connector.sendTransaction(transaction);
+                alert('Золото добыто успешно!');
+            } catch (e) {
+                console.error('Ошибка при добыче золота:', e);
+                alert('Не удалось добыть золото');
+            }
         });
     </script>
 </body>
