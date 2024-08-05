@@ -27,7 +27,7 @@
     <script>
         // Инициализация TonConnect SDK
         const connector = new TonConnectSDK.TonConnect({
-            manifestUrl: 'https://goldense.github.io/goldenclic/tonconnect-manifest.json'
+            manifestUrl: 'https://yourapp.com/tonconnect-manifest.json' // URL манифеста вашего приложения
         });
 
         // Функция для обновления статуса
@@ -40,7 +40,7 @@
             try {
                 // Получение списка поддерживаемых кошельков
                 const walletsList = await connector.getWallets();
-                
+
                 // Проверка наличия доступных кошельков
                 if (walletsList.length === 0) {
                     alert('Нет доступных кошельков для подключения');
