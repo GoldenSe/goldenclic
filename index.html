@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кликер золота</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
         body {
             display: flex;
             flex-direction: column;
@@ -12,7 +14,16 @@
             justify-content: center;
             height: 100vh;
             background-color: #f4f4f4;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+        }
+        #info p {
+            margin: 5px 0;
         }
         #goldDisplay {
             font-size: 24px;
@@ -31,6 +42,10 @@
             cursor: pointer;
             background: url('pickaxe.png') no-repeat center center;
             background-size: 60%;
+            transition: transform 0.1s ease;
+        }
+        #clicker:active {
+            transform: scale(0.9);
         }
         #pickaxeStatus {
             margin-top: 5px;
@@ -81,25 +96,143 @@
         });
 
         let ethereum;
+        let userAccount = null;
+        let userBalance = 0;
 
         // Wait for MetaMask SDK to initialize
         setTimeout(() => {
             ethereum = MMSDK.getProvider();
 
-            // Add listener for MetaMask connection
             ethereum.on('accountsChanged', (accounts) => {
                 console.log('Accounts changed:', accounts);
-                // Update UI or perform actions based on the new accounts
+                userAccount = accounts[0];
+                updateUserInfo();
             });
 
             ethereum.on('chainChanged', (chainId) => {
                 console.log('Chain changed:', chainId);
                 // Update UI or perform actions based on the new chain
             });
+
+            // Fetch initial balance
+            if (ethereum) {
+                ethereum.request({ method: 'eth_requestAccounts' }).then(accounts => {
+                    userAccount = accounts[0];
+                    updateUserInfo();
+                    fetchUserBalance();
+                });
+            }
         }, 0);
+
+        function updateUserInfo() {
+            document.getElementById('userAddress').textContent = `Адрес: ${userAccount || 'Не подключен'}`;
+            document.getElementById('userBalance').textContent = `Баланс: ${userBalance} ETH`;
+        }
+
+        async function fetchUserBalance() {
+            if (ethereum && userAccount) {
+                try {
+                    const balanceWei = await ethereum.request({
+                        method: 'eth_getBalance',
+                        params: [userAccount, 'latest'],
+                    });
+                    userBalance = parseFloat(ethereum.utils.formatEther(balanceWei));
+                    updateUserInfo();
+                } catch (error) {
+                    console.error('Ошибка получения баланса:', error);
+                }
+            }
+        }
+
+        function saveGold() {
+            localStorage.setItem('gold', gold);
+        }
+
+        function loadGold() {
+            const savedGold = localStorage.getItem('gold');
+            if (savedGold) {
+                gold = parseFloat(savedGold);
+                gold = Math.round(gold * 10) / 10; // Округляем до одной цифры после запятой
+                document.getElementById('goldDisplay').textContent = `Золото: ${gold}`;
+            }
+        }
+
+        document.getElementById('connectMetaMask').addEventListener('click', async () => {
+            if (ethereum) {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0];
+                    updateUserInfo();
+                    fetchUserBalance();
+                } catch (error) {
+                    console.error('Ошибка подключения MetaMask:', error);
+                    alert('Не удалось подключиться к MetaMask.');
+                }
+            } else {
+                alert('MetaMask не установлен.');
+            }
+        });
+
+        document.getElementById('clicker').addEventListener('click', () => {
+            if (pickaxeDurability > 0) {
+                let minedGold = Math.random() * (1 - 0.1) + 0.1;
+                gold += minedGold;
+                gold = Math.round(gold * 10) / 10; // Округляем до одной цифры после запятой
+                document.getElementById('goldDisplay').textContent = `Золото: ${gold}`;
+
+                pickaxeDurability -= 0.5;
+                if (pickaxeDurability < 0) pickaxeDurability = 0;
+                document.getElementById('pickaxeStatus').textContent = `Прочность кирки: ${pickaxeDurability}%`;
+                saveGold();
+            } else {
+                alert('Кирка сломалась! Вы не можете добывать золото.');
+            }
+        });
+
+        document.getElementById('connectTonkeeper').addEventListener('click', () => {
+            const address = document.getElementById('addressInput').value;
+            if (address) {
+                const amount = (gold * 1000000000).toFixed(0); // Преобразование золота в нанотонкоины
+                const tonkeeperUrl = `https://app.tonkeeper.com/transfer/${address}?amount=${amount}`;
+                window.open(tonkeeperUrl, "_blank");
+            } else {
+                alert('Пожалуйста, введите адрес получателя.');
+            }
+        });
+
+        document.getElementById('repairPickaxe').addEventListener('click', () => {
+            if (gold >= 1) { // Предположим, что ремонт кирки стоит 1 золото
+                gold -= 1;
+                gold = Math.round(gold * 10) / 10; // Округляем до одной цифры после запятой
+                pickaxeDurability = 100; // Восстанавливаем кирку
+                document.getElementById('goldDisplay').textContent = `Золото: ${gold}`;
+                document.getElementById('pickaxeStatus').textContent = `Прочность кирки: ${pickaxeDurability}%`;
+                saveGold();
+            } else {
+                alert('Недостаточно золота для ремонта кирки.');
+            }
+        });
+
+        document.getElementById('withdrawGold').addEventListener('click', () => {
+            const address = document.getElementById('addressInput').value;
+            if (address) {
+                const amount = (gold * 1000000000).toFixed(0); // Преобразование золота в нанотонкоины
+                const tonkeeperUrl = `https://app.tonkeeper.com/transfer/${address}?amount=${amount}`;
+                window.open(tonkeeperUrl, "_blank");
+            } else {
+                alert('Пожалуйста, введите адрес получателя.');
+            }
+        });
+
+        // Load saved gold on page load
+        window.onload = loadGold;
     </script>
 </head>
 <body>
+    <div id="info">
+        <p id="userAddress">Адрес: Не подключен</p>
+        <p id="userBalance">Баланс: 0 ETH</p>
+    </div>
     <div id="goldDisplay">Золото: 0</div>
     <div id="clicker">Кликни!</div>
     <div id="pickaxeStatus">Прочность кирки: 100%</div>
@@ -108,6 +241,5 @@
     <button id="connectTonkeeper">Подключить Tonkeeper</button>
     <button id="repairPickaxe">Починить кирку</button>
     <button id="withdrawGold">Вывести золото</button>
-    <script src="app.js"></script>
 </body>
 </html>
